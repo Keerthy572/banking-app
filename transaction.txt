@@ -1,0 +1,4 @@
+A1	deposite	5000.0
+A1	deposite	5000.0
+A1	deposite	10000.0
+A1	withdrawal	100000.0

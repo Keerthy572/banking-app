@@ -27,12 +27,17 @@ def account_registration(info):
             file=open('account.txt','a')
             file.write(f"U{int(words[0][1:])+1}\tA{int(words[0][1:])+1}\t{info["password"]}\t{info["initial"]}\n")
             file.close()
+            file=open('transaction.txt','a')
+            file.write(f"A{int(words[0][1:])+1}\tinitial deposite\t{info['initial']}\n")
+            file.close
     except FileNotFoundError:
         x=int(1)
         file=open('account.txt','a')
         file.write(f"U{x}\tA{x}\t{info["password"]}\t{info["initial"]}\n")
         file.close()     
-
+        file=open('transaction.txt','a')
+        file.write(f"A{x}\tinitial deposite\t{info['initial']}\n")
+        file.close
 
 # Saving customer details in txt file
 def customer_registration():
@@ -73,10 +78,54 @@ def deposite():
         except ValueError:
             print('Enter number only')
 
+
+# withdrawing cash
+def withdraw(information):
+    filea=open('account.txt','r')
+    for line in filea:
+        word=line.strip().split()
+        if information['accountnum']==word[1]:
+            balance=float(word[3])
+            break
+    while True:        
+        try:
+            amount=float(input('Enter the withdrawal amount :'))
+            if amount<=0:
+                print('your amount should be greater than zero')   
+            elif amount > balance:
+                print('Your withdrawal amount is greater than your balance')
+                print('your balance is :',balance)                 
+            else:
+                print('withdrawal successful')
+                information['amount']=amount
+                information['transaction_type']='withdrawal'
+                return information
+        except ValueError:
+            print('Enter number only')
+
+
+def balance(information):
+    file=open('account.txt','r')
+    for line in file:
+        word=line.strip().split()
+        if information['accountnum']==word[1]:
+            print(f"Your account balance is :{float(word[3])}")
+
+
+def transaction_history(a):
+    with open('transaction.txt','r') as file:
+        for line in file:
+            word=line.split()
+            if word[0]==a:
+                print(line)
+            
+
+
 # login into a personal account   
 def login():
     u=input('Enter your user name :')
     p=input('Enter your password :')
+    a=input('Enter your account number :')
     username={}
     password={}
     accountnum={}
@@ -95,23 +144,31 @@ def login():
 
     login_successful=False
     for user_id in username:
-        if username[user_id]==u and password[user_id]==p:
+        if username[user_id]==u and password[user_id]==p and accountnum[user_id]==a:
             login_successful=True
-            a=accountnum[user_id]
             break
 
     if login_successful:
         print('login_successful')
-        information=deposite()
+        information={}
         information['accountnum']=a
-        return information
+        if x==1:
+            information.update(deposite())
+            return information
+        elif x==2:
+            information.update(withdraw(information))
+            return information
+        elif x==3:
+            balance(information)
+        elif x==4:
+            transaction_history(a)
     else:
-        print('Incorrect username or password')
+        print('Incorrect username or password or account number')
 
 
 
-# saving deposite details in transaction text file
-def deposite_registrstion():
+# saving deposite or withdrawal details in transaction text file
+def deposite_or_withdarw_registrstion():
     file=open('transaction.txt','a')
     file.write(f"{information['accountnum']}\t{information['transaction_type']}\t{information['amount']}\n")
     file.close
@@ -119,8 +176,13 @@ def deposite_registrstion():
     new_line=[]
     for line in filea:
         word=line.strip().split()
-        if information['accountnum']==word[1]:
+        if information['accountnum']==word[1] and information['transaction type']=='deposite':
             word[3]=str(float(word[3])+information['amount'])
+            line='\t'.join(word)+'\n'
+            new_line.append(line)
+            file.close()
+        elif information['accountnum']==word[1] and information['transaction type']=='withdrawal':
+            word[3]=str(float(word[3])-information['amount'])
             line='\t'.join(word)+'\n'
             new_line.append(line)
             file.close()
@@ -130,10 +192,7 @@ def deposite_registrstion():
     file.writelines(new_line)
     file.close() 
 
-
+x=int(input('Number :'))
 information=login()
-deposite_registrstion()
-
-
-
+# deposite_or_withdarw_registrstion()
 
