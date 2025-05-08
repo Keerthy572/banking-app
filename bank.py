@@ -1,3 +1,10 @@
+def admin():
+    a=input('Enter your admin username :')
+    p=input('Enter your admin password :')
+    with open('admin.txt','a') as file:
+        file.write(f'{a}\t{p}')
+
+
 from datetime import datetime
 # Getting customer's details
 def customer_details():
@@ -120,54 +127,6 @@ def transaction_history(a):
             word=line.split()
             if word[0]==a:
                 print(line)
-            
-
-
-# login into a personal account   
-def login():
-    u=input('Enter your user name :')
-    p=input('Enter your password :')
-    a=input('Enter your account number :')
-    username={}
-    password={}
-    accountnum={}
-    file=open('customer.txt','r')
-    for line in file:
-        word=line.split()
-        username[word[0]]=word[2]
-    file.close()
-    file=open('account.txt','r')
-    for line in file:
-        word=line.split()
-        password[word[0]]=word[2]
-        accountnum[word[0]]=word[1]
-    file.close()
-    
-
-    login_successful=False
-    for user_id in username:
-        if username[user_id]==u and password[user_id]==p and accountnum[user_id]==a:
-            login_successful=True
-            break
-
-    if login_successful:
-        print('login_successful')
-        information={}
-        information['accountnum']=a
-        if x==2:
-            information.update(deposite())
-            deposite_or_withdarw_registrstion(information)
-        elif x==3:
-            information.update(withdraw(information))
-            deposite_or_withdarw_registrstion(information)
-        elif x==4:
-            balance(information)
-        elif x==5:
-            transaction_history(a)
-    else:
-        print('Incorrect username or password or account number')
-
-
 
 # saving deposite or withdrawal details in transaction text file
 def deposite_or_withdarw_registrstion(information):
@@ -194,32 +153,131 @@ def deposite_or_withdarw_registrstion(information):
     file.writelines(new_line)
     file.close() 
 
+def login_admin():
+    print('login_successful')
+    information={}
+    print('========ADMIN MENU==========')
+    while True:
+        print('             1. Account creation')
+        print('             2. Deposit Money')
+        print('             3. Withdraw Money')
+        print('             4. Check Balance')
+        print('             5. Transaction History')
+        print('             6. Exit')
+        print('\n')
+        x=int(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
+        print('\n')
+
+        if x==1:
+            customer_registration()
+        if x==2:
+            a=input('Enter the account number :')
+            information['accountnum']=a
+            information.update(deposite())
+            deposite_or_withdarw_registrstion(information)
+        elif x==3:
+            a=input('Enter the account number :')
+            information['accountnum']=a
+            information.update(withdraw(information))
+            deposite_or_withdarw_registrstion(information)
+        elif x==4:
+            a=input('Enter the account number :')
+            information['accountnum']=a
+            balance(information)
+        elif x==5:
+            a=input('Enter the account number :')
+            information['accountnum']=a
+            transaction_history(a)
+        elif x==6:
+            print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
+            break
+        else:
+            print('Enter a number from 1 to 5')
+            print('\n')           
+
+
+# login into a personal account   
+def login():
+    u=input('Enter your user name :')
+    p=input('Enter your password :')
+    username={}
+    password={}
+    accountnum={}
+    file=open('customer.txt','r')
+    for line in file:
+        word=line.split()
+        username[word[0]]=word[2]
+    file.close()
+    file=open('account.txt','r')
+    for line in file:
+        word=line.split()
+        password[word[0]]=word[2]
+        accountnum[word[0]]=word[1]
+    file.close()
+    with open('admin.txt','r') as file:
+        line=file.readline()
+        word=line.split()
+        admin_username=word[0]
+        admin_password=word[1]
+
+    for user_id in username:
+        if username[user_id]==u and password[user_id]==p :
+            login_successful='user'
+            a=accountnum[user_id]
+            break
+    if admin_username==u and  admin_password==p:
+        login_successful='admin'
+
+
+
+
+    if login_successful=='user':
+        print('login_successful')
+        information={}
+        information['accountnum']=a
+        print('========WELCOME TO OUR BANKING SERVICE==========')
+        while True:
+            print('     OUR SERVICES')
+            print('             1. Deposit Money')
+            print('             2. Withdraw Money')
+            print('             3. Check Balance')
+            print('             4. Transaction History')
+            print('             5. Exit')
+            print('\n')
+            x=int(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
+            print('\n')
+
+            if x==1:
+                    information.update(deposite())
+                    deposite_or_withdarw_registrstion(information)
+            elif x==2:
+                    information.update(withdraw(information))
+                    deposite_or_withdarw_registrstion(information)
+            elif x==3:
+                balance(information)
+            elif x==4:
+                transaction_history(a)
+            elif x==5:
+                print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
+                break
+            else:
+                print('Enter a number from 1 to 5')
+                print('\n')
+
+    elif login_successful=='admin':
+        login_admin()
+    else:
+        print('Incorrect username or password or account number')
+
+import os
+file='admin.txt'
+if os.path.exists(file):
+    login()
+else:
+    admin()
+    login_admin()
+
 # x=int(input('Number :'))
 # information=login()
 # deposite_or_withdarw_registrstion()
 
-print('========WELCOME TO OUR BANKING SERVICE==========')
-while True:
-    print('     OUR SERVICES')
-    print('             1.Create Account')
-    print('             2. Deposit Money')
-    print('             3. Withdraw Money')
-    print('             4. Check Balance')
-    print('             5. Transaction History')
-    print('             6. Exit')
-    print('\n')
-    x=int(input('Please enter number 1,2,3,4,5,6 in order to select the above services :'))
-    print('\n')
-
-    if x==1:
-        customer_registration()
-        print('\n')
-    elif x==2 or x==3 or x==4 or x==5:
-        login()
-        print('\n')
-    elif x==6:
-        print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
-        break
-    else:
-        print('Enter a number from 1 to 6')
-        print('\n')
