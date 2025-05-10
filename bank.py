@@ -373,11 +373,11 @@ def login():
             print('             4. Transaction History')
             print('             5. Exit')
             while True:
-            try:
-                x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
-                break
-            except ValueError:
-                print('Enter a valid number')
+                try:
+                    x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
+                    break
+                except ValueError:
+                    print('Enter a valid number')
 
             if x==1:
                     information.update(deposit())
@@ -425,4 +425,4 @@ else:
     admin()
     login_admin()
     login_again()
-1
+

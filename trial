@@ -1,3 +1,0 @@
-customer= user id , name , user name, phone number
-account = user id, acc num, password,balance
-transaction= acc num , date ,transaction type, amount
