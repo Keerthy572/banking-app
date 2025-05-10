@@ -25,13 +25,17 @@ def customer_details():
                 break
             else:
                 print("Name cannot be blank,Try again")
+    username={}            
     if os.path.exists('customer.txt'):
-        username={}
         status = None
         with open('customer.txt','r') as file:
             for line in file:
                 word=line.split()
                 username[word[0]]=word[2]
+        with open('admin.txt','r') as file:
+            for line in file:
+                word=line.split()
+                username[word[1]]=word[0]
         while True:
             status='no'
             user=input('Enter your user name :')
@@ -48,12 +52,25 @@ def customer_details():
             else:
                 break
     else:
+        with open('admin.txt','r') as file:
+            for line in file:
+                word=line.split()
+                username[word[1]]=word[0]
         while True:
+            status='no'
             user=input('Enter your user name :')
-            if user.strip()!="":
-                break
-            else:
+            for userid in username:
+                if username[userid]==user:
+                    status = 'yes'
+                    break
+            if status=='yes':
+                print('Username already exists, Try again')
+                continue
+            elif user.strip()=="":
                 print("Username cannot be blank,Try again")
+                continue
+            else:
+                break
     while True:
         phone = input("Enter your phone number (starting with 07 and 10 digits): ")
         if len(phone) == 10 and phone.isdigit() and phone.startswith("07"):
@@ -209,6 +226,44 @@ def deposit_or_withdarw_registrstion(information):
     file.writelines(new_line)
     file.close() 
 
+
+def accountnum_check():
+    while True:
+        y=None
+        a=input('Enter the account number :')
+        try:
+            with open('account.txt','r')as file:
+                for line in file:
+                    word=line.split()
+                    if word[1]==a:
+                        y=1
+                        break
+        except FileNotFoundError:
+            print('Not any accounts have been registered yet. First create an account')
+            break
+        if y==1:
+            return y,a
+        else:
+            print('This account number does not exist,Try again')   
+            try:
+                print('1.Try again')
+                print('2.Exit')
+                z=int(input('Enter number 1 or 2 to choose :'))
+                if z==1:
+                    continue
+                elif z==2:
+                    break
+                else:
+                    print('Enter only number 1 or 2')
+            except ValueError:
+                print('Enter numbers only(1 or 2)')
+
+
+def view_all_acc():
+    with open('account.txt','r')as file:
+        for line in file:
+            print(line)    
+
 def login_admin():
     print('login_successful')
     information={}
@@ -219,51 +274,44 @@ def login_admin():
         print('             3. Withdraw Money')
         print('             4. Check Balance')
         print('             5. Transaction History')
-        print('             6. Exit')
+        print('             6. View all accounts')
+        print('             7. Exit')
         print('\n')
-        x=float(input('Please enter number 1,2,3,4,5,6 in order to select the above services :'))
+        x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
         print('\n')
 
         if x==1:
             customer_registration()
         elif x==2:
-            while True:
-                status=False
-                a=input('Enter the account number :')
-                with open('account.txt','r')as file:
-                    for line in file:
-                        word=line.split()
-                        if word[1]==a:
-                            status=True
-                            break
-                if status:
+            y,a=accountnum_check()
+            if y==1:
                     information['accountnum']=a
                     information.update(deposit())
                     deposit_or_withdarw_registrstion(information)
-                    break
-                else:
-                    print('This account number does not exist,Try again')   
-            
         elif x==3:
-            a=input('Enter the account number :')
-            information['accountnum']=a
-            information.update(withdraw(information))
-            deposit_or_withdarw_registrstion(information)
+            y,a=accountnum_check()
+            if y==1:
+                information['accountnum']=a
+                information.update(withdraw(information))
+                deposit_or_withdarw_registrstion(information)
         elif x==4:
-            a=input('Enter the account number :')
-            information['accountnum']=a
-            balance(information)
+            y,a=accountnum_check()
+            if y==1:
+                information['accountnum']=a
+                balance(information)
         elif x==5:
-            a=input('Enter the account number :')
-            information['accountnum']=a
-            transaction_history(a)
+            y,a=accountnum_check()
+            if y==1:
+                information['accountnum']=a
+                transaction_history(a)
         elif x==6:
+            view_all_acc()
+        elif x==7:
             print('THANK YOU')
             break
         else:
             print('Enter a number from 1 to 6')
             print('\n')           
-
 
 # login into a personal account   
 def login():
@@ -365,3 +413,4 @@ else:
     admin()
     login_admin()
     login_again()
+1
