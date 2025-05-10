@@ -1,17 +1,73 @@
+import os
+from datetime import datetime
 def admin():
-    a=input('Enter your admin username :')
-    p=input('Enter your admin password :')
+    while True:
+        a=input('Enter your admin username :')
+        if a.strip()!="":
+            break
+        else:
+            print("Username cannot be blank,Try again")
+    while True:
+        p=input('Enter your admin password :')
+        if p.strip()!="" and 8<=len(p)<=12:
+            break
+        else:
+            print('password should be minimum 8 characters or maximum 12 characters')
     with open('admin.txt','a') as file:
         file.write(f'{a}\t{p}')
 
 
-from datetime import datetime
 # Getting customer's details
 def customer_details():
-    name=input('Enter your name :')
-    user=input('Enter your user name :')
-    phone=input('Enter your phone number :')
-    password=input('Enter your password :')
+    while True:
+            name=input('Enter your name :')
+            if name.strip()!="":
+                break
+            else:
+                print("Name cannot be blank,Try again")
+    if os.path.exists('customer.txt'):
+        username={}
+        status = None
+        with open('customer.txt','r') as file:
+            for line in file:
+                word=line.split()
+                username[word[0]]=word[2]
+        while True:
+            status='no'
+            user=input('Enter your user name :')
+            for userid in username:
+                if username[userid]==user:
+                    status = 'yes'
+                    break
+            if status=='yes':
+                print('Username already exists, Try again')
+                continue
+            elif user.strip()=="":
+                print("Username cannot be blank,Try again")
+                continue
+            else:
+                break
+    else:
+        while True:
+            user=input('Enter your user name :')
+            if user.strip()!="":
+                break
+            else:
+                print("Username cannot be blank,Try again")
+    while True:
+        phone = input("Enter your phone number (starting with 07 and 10 digits): ")
+        if len(phone) == 10 and phone.isdigit() and phone.startswith("07"):
+            print("Phone number accepted.")
+            break
+        else:
+            print("Invalid phone number. Please enter a valid 10-digit number starting with 07.")
+
+    while True:
+        password=input('Enter your password :')
+        if password.strip()!="" and 8<=len(password)<=12:
+            break
+        else:
+            print('password should be minimum 8 characters or maximum 12 characters and can not be blank')
     while True:        
         
             try:
@@ -38,7 +94,7 @@ def account_registration(info):
             file.close()
             file=open('transaction.txt','a')
             file.write(f"A{int(words[0][1:])+1}\tinitial deposite\t{info['initial']}\t{info["time"]}\n")
-            file.close
+            file.close()
     except FileNotFoundError:
         x=int(1)
         file=open('account.txt','a')
@@ -47,7 +103,7 @@ def account_registration(info):
         file.close()     
         file=open('transaction.txt','a')
         file.write(f"A{x}\tinitial deposite\t{info['initial']}\t{info["time"]}\n")
-        file.close
+        file.close()
 
 # Saving customer details in txt file
 def customer_registration():
@@ -71,11 +127,9 @@ def customer_registration():
             account_registration(info)
             print('successfully created an account')
 
-# customer_registration()
-
 
 # depositing cash
-def deposite():
+def deposit():
     while True:        
         try:
             amount=float(input('Enter the amount you would like to deposit :'))
@@ -83,7 +137,7 @@ def deposite():
                 print('your amount should be greater than zero')                    
             else:
                 print('Deposite successful')
-                information={'amount':amount,'transaction_type':'deposite','time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                information={'amount':amount,'transaction_type':'deposit','time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
                 return information
         except ValueError:
             print('Enter number only')
@@ -100,7 +154,11 @@ def withdraw(information):
     while True:        
         try:
             amount=float(input('Enter the withdrawal amount :'))
-            if amount<=0:
+            if balance==0:
+                print('Your account balance is zero')
+                print("Can't do withdrawal")
+                break
+            elif amount<=0:
                 print('your amount should be greater than zero')   
             elif amount > balance:
                 print('Your withdrawal amount is greater than your balance')
@@ -114,11 +172,11 @@ def withdraw(information):
 
 
 def balance(information):
-    file=open('account.txt','r')
-    for line in file:
-        word=line.strip().split()
-        if information['accountnum']==word[1]:
-            print(f"Your account balance is :{float(word[3])}")
+    with open('account.txt','r') as file:
+        for line in file:
+            word=line.strip().split()
+            if information['accountnum']==word[1]:
+                print(f"Your account balance is :{float(word[3])}")
 
 
 def transaction_history(a):
@@ -129,26 +187,24 @@ def transaction_history(a):
                 print(line)
 
 # saving deposite or withdrawal details in transaction text file
-def deposite_or_withdarw_registrstion(information):
+def deposit_or_withdarw_registrstion(information):
     file=open('transaction.txt','a')
     file.write(f"{information['accountnum']}\t{information['transaction_type']}\t{information['amount']}\t{information['time']}\n")
-    file.close
-    filea=open('account.txt','r')
-    new_line=[]
-    for line in filea:
-        word=line.strip().split()
-        if information['accountnum']==word[1] and information['transaction_type']=='deposite':
-            word[3]=str(float(word[3])+information['amount'])
-            line='\t'.join(word)+'\n'
-            new_line.append(line)
-            file.close()
-        elif information['accountnum']==word[1] and information['transaction_type']=='withdrawal':
-            word[3]=str(float(word[3])-information['amount'])
-            line='\t'.join(word)+'\n'
-            new_line.append(line)
-            file.close()
-        else:
-            new_line.append(line)
+    file.close()
+    with open('account.txt','r') as filea:
+        new_line=[]
+        for line in filea:
+            word=line.strip().split()
+            if information['accountnum']==word[1] and information['transaction_type']=='deposit':
+                word[3]=str(float(word[3])+information['amount'])
+                line='\t'.join(word)+'\n'
+                new_line.append(line)
+            elif information['accountnum']==word[1] and information['transaction_type']=='withdrawal':
+                word[3]=str(float(word[3])-information['amount'])
+                line='\t'.join(word)+'\n'
+                new_line.append(line)
+            else:
+                new_line.append(line)
     file=open('account.txt','w') 
     file.writelines(new_line)
     file.close() 
@@ -165,21 +221,34 @@ def login_admin():
         print('             5. Transaction History')
         print('             6. Exit')
         print('\n')
-        x=int(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
+        x=float(input('Please enter number 1,2,3,4,5,6 in order to select the above services :'))
         print('\n')
 
         if x==1:
             customer_registration()
-        if x==2:
-            a=input('Enter the account number :')
-            information['accountnum']=a
-            information.update(deposite())
-            deposite_or_withdarw_registrstion(information)
+        elif x==2:
+            while True:
+                status=False
+                a=input('Enter the account number :')
+                with open('account.txt','r')as file:
+                    for line in file:
+                        word=line.split()
+                        if word[1]==a:
+                            status=True
+                            break
+                if status:
+                    information['accountnum']=a
+                    information.update(deposit())
+                    deposit_or_withdarw_registrstion(information)
+                    break
+                else:
+                    print('This account number does not exist,Try again')   
+            
         elif x==3:
             a=input('Enter the account number :')
             information['accountnum']=a
             information.update(withdraw(information))
-            deposite_or_withdarw_registrstion(information)
+            deposit_or_withdarw_registrstion(information)
         elif x==4:
             a=input('Enter the account number :')
             information['accountnum']=a
@@ -189,10 +258,10 @@ def login_admin():
             information['accountnum']=a
             transaction_history(a)
         elif x==6:
-            print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
+            print('THANK YOU')
             break
         else:
-            print('Enter a number from 1 to 5')
+            print('Enter a number from 1 to 6')
             print('\n')           
 
 
@@ -203,23 +272,26 @@ def login():
     username={}
     password={}
     accountnum={}
-    file=open('customer.txt','r')
-    for line in file:
-        word=line.split()
-        username[word[0]]=word[2]
-    file.close()
-    file=open('account.txt','r')
-    for line in file:
-        word=line.split()
-        password[word[0]]=word[2]
-        accountnum[word[0]]=word[1]
-    file.close()
+    try:
+        file=open('customer.txt','r')
+        for line in file:
+            word=line.split()
+            username[word[0]]=word[2]
+        file.close()
+        file=open('account.txt','r')
+        for line in file:
+            word=line.split()
+            password[word[0]]=word[2]
+            accountnum[word[0]]=word[1]
+        file.close()
+    except FileNotFoundError:
+        pass
     with open('admin.txt','r') as file:
         line=file.readline()
         word=line.split()
         admin_username=word[0]
         admin_password=word[1]
-
+    login_successful=None
     for user_id in username:
         if username[user_id]==u and password[user_id]==p :
             login_successful='user'
@@ -233,6 +305,7 @@ def login():
 
     if login_successful=='user':
         print('login_successful')
+        print('\n')
         information={}
         information['accountnum']=a
         print('========WELCOME TO OUR BANKING SERVICE==========')
@@ -243,22 +316,21 @@ def login():
             print('             3. Check Balance')
             print('             4. Transaction History')
             print('             5. Exit')
-            print('\n')
-            x=int(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
+            x=float(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
             print('\n')
 
             if x==1:
-                    information.update(deposite())
-                    deposite_or_withdarw_registrstion(information)
+                    information.update(deposit())
+                    deposit_or_withdarw_registrstion(information)
             elif x==2:
                     information.update(withdraw(information))
-                    deposite_or_withdarw_registrstion(information)
+                    deposit_or_withdarw_registrstion(information)
             elif x==3:
                 balance(information)
             elif x==4:
                 transaction_history(a)
             elif x==5:
-                print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
+                print('THANK YOU')
                 break
             else:
                 print('Enter a number from 1 to 5')
@@ -269,15 +341,27 @@ def login():
     else:
         print('Incorrect username or password or account number')
 
-import os
+def login_again():
+    while True:
+        try:
+            print('1.Login again')
+            print('2.Exit')
+            y=int(input('Enter number 1 or 2 to choose :'))
+            if y==1:
+                login()
+            elif y==2:
+                print('THANK YOU VERY MUCH FOR USING OUR BANKING SYSTEM. BYE...')
+                break
+            else:
+                print('Enter only number 1 or 2')
+        except ValueError:
+            print('Enter numbers only(1 or 2)')
+
 file='admin.txt'
 if os.path.exists(file):
     login()
+    login_again()
 else:
     admin()
     login_admin()
-
-# x=int(input('Number :'))
-# information=login()
-# deposite_or_withdarw_registrstion()
-
+    login_again()
