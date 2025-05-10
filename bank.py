@@ -16,7 +16,6 @@ def admin():
     with open('admin.txt','a') as file:
         file.write(f'{a}\t{p}')
 
-
 # Getting customer's details
 def customer_details():
     while True:
@@ -72,12 +71,12 @@ def customer_details():
             else:
                 break
     while True:
-        phone = input("Enter your phone number (starting with 07 and 10 digits): ")
-        if len(phone) == 10 and phone.isdigit() and phone.startswith("07"):
+        phone = input("Enter your phone number (starting with 07 or 021 and 10 digits): ")
+        if len(phone) == 10 and phone.isdigit() and (phone.startswith("07") or phone.startswith("021")):
             print("Phone number accepted.")
             break
         else:
-            print("Invalid phone number. Please enter a valid 10-digit number starting with 07.")
+            print("Invalid phone number. Please enter a valid 10-digit number starting with 07 or 021.")
 
     while True:
         password=input('Enter your password :')
@@ -113,7 +112,7 @@ def account_registration(info):
             file.write(f"A{int(words[0][1:])+1}\tinitial deposite\t{info['initial']}\t{info["time"]}\n")
             file.close()
     except FileNotFoundError:
-        x=int(1)
+        x=int(1000)
         file=open('account.txt','a')
         file.write(f"U{x}\tA{x}\t{info["password"]}\t{info["initial"]}\n")
         print(f'Your account number is :A{x}')
@@ -137,7 +136,7 @@ def customer_registration():
             account_registration(info)
             print('successfully created an account')
     except FileNotFoundError:
-            x=int(1)
+            x=int(1000)
             file=open('customer.txt','a')
             file.write(f"U{x}\t{info['name']}\t{info['user']}\t{info['phone']}\n")
             file.close()
@@ -229,7 +228,8 @@ def deposit_or_withdarw_registrstion(information):
 
 def accountnum_check():
     while True:
-        y=None
+        global y 
+        global a
         a=input('Enter the account number :')
         try:
             with open('account.txt','r')as file:
@@ -260,9 +260,12 @@ def accountnum_check():
 
 
 def view_all_acc():
-    with open('account.txt','r')as file:
-        for line in file:
-            print(line)    
+    try:
+        with open('account.txt','r')as file:
+            for line in file:
+                print(line)   
+    except FileNotFoundError:
+        print('No accounts have been created yet') 
 
 def login_admin():
     print('login_successful')
@@ -276,31 +279,36 @@ def login_admin():
         print('             5. Transaction History')
         print('             6. View all accounts')
         print('             7. Exit')
+        while True:
+            try:
+                x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
+                break
+            except ValueError:
+                print('Enter a valid number')
         print('\n')
-        x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
-        print('\n')
-
+        y=None
+        a=None
         if x==1:
             customer_registration()
         elif x==2:
-            y,a=accountnum_check()
+            accountnum_check()
             if y==1:
                     information['accountnum']=a
                     information.update(deposit())
                     deposit_or_withdarw_registrstion(information)
         elif x==3:
-            y,a=accountnum_check()
+            accountnum_check()
             if y==1:
                 information['accountnum']=a
                 information.update(withdraw(information))
                 deposit_or_withdarw_registrstion(information)
         elif x==4:
-            y,a=accountnum_check()
+            accountnum_check()
             if y==1:
                 information['accountnum']=a
                 balance(information)
         elif x==5:
-            y,a=accountnum_check()
+            accountnum_check()
             if y==1:
                 information['accountnum']=a
                 transaction_history(a)
@@ -364,8 +372,12 @@ def login():
             print('             3. Check Balance')
             print('             4. Transaction History')
             print('             5. Exit')
-            x=float(input('Please enter number 1,2,3,4,5, in order to select the above services :'))
-            print('\n')
+            while True:
+            try:
+                x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
+                break
+            except ValueError:
+                print('Enter a valid number')
 
             if x==1:
                     information.update(deposit())
