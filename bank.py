@@ -9,10 +9,10 @@ def admin():
             print("Username cannot be blank,Try again")
     while True:
         p=input('Enter your admin password :')
-        if p.strip()!="" and 8<=len(p)<=12:
+        if p.strip()!="" and 6<=len(p)<=12:
             break
         else:
-            print('password should be minimum 8 characters or maximum 12 characters')
+            print('password should be minimum 6 characters or maximum 12 characters')
     with open('admin.txt','a') as file:
         file.write(f'{a}\t{p}')
 
@@ -80,10 +80,10 @@ def customer_details():
 
     while True:
         password=input('Enter your password :')
-        if password.strip()!="" and 8<=len(password)<=12:
+        if password.strip()!="" and 6<=len(password)<=12:
             break
         else:
-            print('password should be minimum 8 characters or maximum 12 characters and can not be blank')
+            print('password should be minimum 6 characters or maximum 12 characters and can not be blank')
     while True:        
         
             try:
@@ -113,6 +113,8 @@ def account_registration(info):
             file.close()
     except FileNotFoundError:
         x=int(1000)
+        # Here the number generation starts from 1000 and increases in order.
+        # So it will be positive and a four digit number until 9999.
         file=open('account.txt','a')
         file.write(f"U{x}\tA{x}\t{info["password"]}\t{info["initial"]}\n")
         print(f'Your account number is :A{x}')
@@ -259,6 +261,23 @@ def accountnum_check():
                 print('Enter numbers only(1 or 2)')
 
 
+def display_customer_list():
+    customers={}
+    try :
+        with open('customer.txt','r') as file:
+            lines=file.readlines()
+            for line in lines:
+                word=line.strip().split()   
+                customers[word[0]]=[word[1]  ,]
+            if customers=="":
+                print('Not any customers found.')
+            else:
+                print(customers)
+    except FileNotFoundError:
+        print('customer file not found or customers have not been created yet')
+
+
+
 def view_all_acc():
     try:
         with open('account.txt','r')as file:
@@ -278,10 +297,11 @@ def login_admin():
         print('             4. Check Balance')
         print('             5. Transaction History')
         print('             6. View all accounts')
-        print('             7. Exit')
+        print('             7. Display customer list')
+        print('             8. Exit')
         while True:
             try:
-                x=float(input('Please enter number 1,2,3,4,5,6,7 in order to select the above services :'))
+                x=float(input('Please enter number 1,2,3,4,5,6,7,8 in order to select the above services :'))
                 break
             except ValueError:
                 print('Enter a valid number')
@@ -315,10 +335,12 @@ def login_admin():
         elif x==6:
             view_all_acc()
         elif x==7:
+            display_customer_list()
+        elif x==8:
             print('THANK YOU')
             break
         else:
-            print('Enter a number from 1 to 6')
+            print('Enter a number from 1 to 8')
             print('\n')           
 
 # login into a personal account   
